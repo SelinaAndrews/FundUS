@@ -42,3 +42,20 @@ Das von FundUS erwartete Datenformat der Microsoft Access-Datenbank entspricht d
 
 - Beispieldatenbank erstellen
 - Unreal-Visualisierung von Blueprint zu C++ konvertieren
+
+# Verwendete Softwarepakete und Unreal-Plugins
+
+Java Spring Server
+https://spring.io/
+
+Delaunay Triangulator von Johannes Diemke
+https://github.com/jdiemke/delaunay-triangulator
+
+UCanAccess
+http://ucanaccess.sourceforge.net/site.html
+
+VaREST Plugin für Unreal Engine
+https://github.com/ufna/VaRest
+
+Extended Standard Library für Unreal Engine
+https://code.lowentry.com/Applications/Plugins/UE4/ExtendedStandardLibrary
