@@ -12,6 +12,7 @@ import java.util.List;
 
 public class SurfaceCalculator {
 
+    /** Triangulate the delaunay representation of a given list of points and return a list of triangles. **/
     public List<Triangle> calculateSurface(List<Vertex> pointList, boolean isProfile) throws NotEnoughPointsException {
         List<Vector2D> pointSet;
         if (isProfile) {
@@ -28,6 +29,7 @@ public class SurfaceCalculator {
         return formatConnections(triangleSoup);
     }
 
+    /** Convert 3D vertices into 2D points by ignoring the z axis. **/
     private List<Vector2D> preparePointSet(List<Vertex> pointList) {
         List<Vector2D> pointSet = new ArrayList<>();
 
@@ -39,6 +41,7 @@ public class SurfaceCalculator {
         return pointSet;
     }
 
+    /** Convert 3D vertices into 2D points by checking if the x or the y axis has the higher variance and ignoring the axis with the lower variance. **/
     private List<Vector2D> prepareProfilePointSet(List<Vertex> pointList) {
         List<Vector2D> pointSet = new ArrayList<>();
 
@@ -81,6 +84,7 @@ public class SurfaceCalculator {
         return pointSet;
     }
 
+    /** Extract the indices of 2D points from the 2D triangles and create 3D triangles from them. **/
     private List<Triangle> formatConnections(List<Triangle2D> triangleSoup) {
         List<Triangle> connections = new ArrayList<>();
 

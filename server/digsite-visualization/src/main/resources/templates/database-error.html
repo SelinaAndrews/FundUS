@@ -12,11 +12,13 @@
             <div class="alert alert-danger">
                 <strong>Achtung!</strong> Es konnte keine Verbindung zur Datenbank hergestellt werden. Bitte prüfen Sie die Eingaben.
             </div>
+            <!-- Same form as in index.html -->
             <div class="container p-3">
                 <form id="startup" action="#" th:action="@{/startup}" th:object="${sessiondata}" method="post" class="needs-validation">
                     <div class="form-group">
                         <label for="database">Datenbank</label>
                         <input  class="form-control" required type="text" id="database" name="database" placeholder="Pfad zur Datenbank einfügen" th:field="*{database}">
+                        <p class="small my-2">Der Pfad zur Datenbank kann durch <kbd>Shift + Rechtsklick</kbd> auf die Access-Datei und die Auswahl von „Als Pfad kopieren“ im Kontextmenü erhalten werden.</p>
                     </div>
                     <div class="form-group">
                         <label for="table">Tabelle</label>

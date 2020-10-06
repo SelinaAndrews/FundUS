@@ -27,6 +27,7 @@ public class VisualizationFormatter {
     private final String topo = "TOPO";
     private String info = "";
 
+    /** Create a Visualization object with which to send data to the visualization application. **/
     public Visualization formatVisualization(List<Measurement> originalMeasurements, SessionData sessionData) {
         this.sessionData = sessionData;
 
@@ -55,6 +56,7 @@ public class VisualizationFormatter {
         return visualization;
     }
 
+    /** Calculate a profile surface from the points given. **/
     public Surface formatProfileSurface(Profile profile) throws NotEnoughPointsException {
         SurfaceCalculator surfaceCalculator = new SurfaceCalculator();
 
@@ -67,6 +69,7 @@ public class VisualizationFormatter {
         return  surface;
     }
 
+    /** Filter the measurements to only include measurements within the axis limits given. **/
     private List<Measurement> limitAxes(List<Measurement> originalMeasurements) {
         List<Measurement> limitedMeasurements = new ArrayList<>(originalMeasurements);
         limitedMeasurements.removeIf(m -> m.getX() == null);
@@ -105,6 +108,10 @@ public class VisualizationFormatter {
         return limitedMeasurements;
     }
 
+    /** Create a finding number for each single or group find that matches the following pattern:
+     *  for single findings: [digsite][year of dig].[unit].[finding number]
+     *  for group findings: [digsite][year of dig].[unit][sub unit].[finding number].[sub finding number]
+     * **/
     private String formatFindingNumber(Measurement measurement, String type) {
 
         StringBuilder findingNumber = new StringBuilder();
@@ -122,6 +129,7 @@ public class VisualizationFormatter {
             findingNumber.append(".");
             findingNumber.append(measurement.getUNIT());
 
+            //Get the sub unit (a, b, c, or d) depending on the location of the group finding within the unit
             double x = Double.parseDouble(measurement.getX().replace(",", "."));
             double y = Double.parseDouble(measurement.getY().replace(",", "."));
 
@@ -151,6 +159,7 @@ public class VisualizationFormatter {
         return findingNumber.toString();
     }
 
+    /** Format the information for a single finding for the visualization application. **/
     private SingularFinding formatSingularFinding(Measurement measurement) {
 
         SingularFinding finding = new SingularFinding();
@@ -175,6 +184,7 @@ public class VisualizationFormatter {
         return finding;
     }
 
+    /** Calculate the layer number from the geological horizon information from the database. **/
     private int getLayer(String geologicalHorizon) {
 
         if (geologicalHorizon != null) {
@@ -204,9 +214,11 @@ public class VisualizationFormatter {
 
     }
 
+    /** Format the information for all surfaces for the visualization application. **/
     private List<Surface> formatSurfaces(List<Measurement> allMeasurements) {
         List<Surface> surfaces = new ArrayList<>();
 
+        //Filter the measurements to only select surface data
         List<Measurement> topoMeasurements = new ArrayList<>();
         for (Measurement measurement : allMeasurements) {
             if (topo.equals(measurement.getBEST())) {
@@ -218,6 +230,7 @@ public class VisualizationFormatter {
 
         SurfaceCalculator surfaceCalculator = new SurfaceCalculator();
 
+        //For each group of surface measurements, calculate a new surface object
         for (MeasurementGroupIdentifier s : measurementGroupIdentifiers) {
             List<Vertex> pointList = new ArrayList<>();
             String geologicalHorizon = "";
@@ -252,9 +265,11 @@ public class VisualizationFormatter {
         return surfaces;
     }
 
+    /** Format the information for all group findings for the visualization application. **/
     private List<GroupFinding> formatGroupFindings(List<Measurement> allMeasurements) {
         List<GroupFinding> groupFindings = new ArrayList<>();
 
+        //Filter the measurements to exclude single finds and surfaces
         List<Measurement> groupMeasurements = new ArrayList<>();
         for (Measurement measurement : allMeasurements) {
             if (!measurement.getEF() && !topo.equals(measurement.getBEST())) {
@@ -264,6 +279,7 @@ public class VisualizationFormatter {
 
         Set<MeasurementGroupIdentifier> measurementGroupIdentifiers = getMeasurementGroupIdentifiers(groupMeasurements);
 
+        //For each group measurement create a new group finding objects with as many sub group findings as applicable
         for (MeasurementGroupIdentifier s : measurementGroupIdentifiers) {
             GroupFinding groupFinding = new GroupFinding();
 
@@ -306,19 +322,23 @@ public class VisualizationFormatter {
         return groupFindings;
     }
 
+    /** Group measurements by creating identifiers made from unit and ID for group findings and surfaces. **/
     private Set<MeasurementGroupIdentifier> getMeasurementGroupIdentifiers(List<Measurement> measurements) {
         Set<MeasurementGroupIdentifier> measurementGroupIdentifiers = new HashSet<>();
 
         for (Measurement m : measurements) {
             boolean isRegistered = false;
+            //Create a group identifier from unit and ID
             MeasurementGroupIdentifier identifier = new MeasurementGroupIdentifier(m.getUNIT(), m.getID());
             for (MeasurementGroupIdentifier s : measurementGroupIdentifiers) {
+                //Check if the identifier created from the measurement has already been registered
                 if (s.equals(identifier)) {
                     isRegistered = true;
                     break;
                 }
             }
             if (!isRegistered) {
+                //Register a new identifier that has not been registered before
                 measurementGroupIdentifiers.add(identifier);
             }
         }

@@ -18,15 +18,19 @@ public class SessionData {
     private String yHigh = "";
     private String zLow = "";
     private String zHigh = "";
-    private boolean preset;
+    private boolean preset; //Using axis limits from website - yes/no
 
+    /** For each pair of limitations of an axis, check which one is higher. Set this as the high value of this axis and the other as the low value. **/
     public void setAxisLimitations(String x1, String x2, String y1, String y2, String z1, String z2) throws IOException {
         try {
+            //Check if x values are both present
             if (!x1.isEmpty() && !x2.isEmpty()) {
                 if (Double.parseDouble(x1.replace(",", ".")) <= Double.parseDouble(x2.replace(",", "."))) {
+                    //x2 is the higher, x1 the lower value OR both values are the same
                     this.setxLow(x1);
                     this.setxHigh(x2);
                 } else {
+                    //x1 is the higher, x2 the lower value
                     this.setxLow(x2);
                     this.setxHigh(x1);
                 }
@@ -34,12 +38,14 @@ public class SessionData {
                 this.setxLow(x1);
                 this.setxHigh(x2);
             }
-
+            //Check if y values are both present
             if (!y1.isEmpty() && !y2.isEmpty()) {
                 if (Double.parseDouble(y1.replace(",", ".")) <= Double.parseDouble(y2.replace(",", "."))) {
+                    //y2 is the higher, y1 the lower value OR both values are the same
                     this.setyLow(y1);
                     this.setyHigh(y2);
                 } else {
+                    //y1 is the higher, y2 the lower value
                     this.setyLow(y2);
                     this.setyHigh(y1);
                 }
@@ -47,12 +53,14 @@ public class SessionData {
                 this.setyLow(y1);
                 this.setyHigh(y2);
             }
-
+            //Check if z values are both present
             if (!z1.isEmpty() && !z2.isEmpty()) {
                 if (Double.parseDouble(z1.replace(",", ".")) <= Double.parseDouble(z2.replace(",", "."))) {
+                    //z2 is the higher, z1 the lower value OR both values are the same
                     this.setzLow(z1);
                     this.setzHigh(z2);
                 } else {
+                    //z1 is the higher, z2 the lower value
                     this.setzLow(z2);
                     this.setzHigh(z1);
                 }

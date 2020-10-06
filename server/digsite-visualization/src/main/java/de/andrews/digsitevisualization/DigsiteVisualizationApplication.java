@@ -17,6 +17,8 @@ public class DigsiteVisualizationApplication {
 
 	public static void main(String[] args) {
 		SpringApplication.run(DigsiteVisualizationApplication.class, args);
+
+		//Open web interface in preferred browser
 		if(Desktop.isDesktopSupported()){
 			Desktop desktop = Desktop.getDesktop();
 			try {

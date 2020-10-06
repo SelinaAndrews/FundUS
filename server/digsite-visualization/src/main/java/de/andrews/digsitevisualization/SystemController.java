@@ -45,6 +45,7 @@ public class SystemController {
     public String startTool(@ModelAttribute("sessiondata") SessionData sessiondata) {
         this.sessionData = sessiondata;
 
+        //Remove leading and trailing quotation marks from the database string
         if (sessiondata.getDatabase().startsWith("\"")) {
             sessiondata.setDatabase(sessiondata.getDatabase().substring(1));
         }
@@ -53,11 +54,13 @@ public class SystemController {
         }
 
         try {
+            //Request all measurements from the database
             List<Measurement> measurements = measurementRepository.findAll(sessionData.getDatabase(), sessionData.getTable());
             System.out.println("Number of measurements: " + measurements.size());
 
             visualizationFormatter.formatVisualization(measurements, sessionData);
 
+            //Get presets for axis limitations from the web surface
             if(!sessionData.getxHigh().isEmpty()
                     || !sessionData.getxLow().isEmpty()
                     || !sessionData.getyHigh().isEmpty()
@@ -71,6 +74,7 @@ public class SystemController {
                 sessiondata.setPreset(false);
             }
 
+            //Start the visualization software
             Process process = new ProcessBuilder("DigsiteVisualization.exe").start();
 
         } catch (SQLException e) {
@@ -100,6 +104,7 @@ public class SystemController {
                                               @RequestParam(required = false, defaultValue = "") String z2) {
 
         try {
+            //For a startup with presets from the website ignore the default values
             if (sessionData.isPreset()) {
                 sessionData.setPreset(false);
             } else {
