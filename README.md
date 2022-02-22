@@ -3,6 +3,8 @@ _For English version, see below._
 # FundUS - Das Fundstellen-Untersuchungssystem für paläolithische Grabungsdaten
 _Version 1.0_
 
+Download: [https://github.com/SelinaAndrews/FundUS/releases/tag/v1.0.0](https://github.com/SelinaAndrews/FundUS/releases/tag/v1.0.0)
+
 ## Was ist FundUS?
 
 FundUS (Fundstellen-Untersuchungssystem) in eine interaktive Anwendung zur 3D-Visualisierung von paläolithischen Grabungsdaten in schematischer Darstellung. Das Ziel der Software ist es, eine paläolithische Fundstelle am Computer zu rekonstruieren, um daran archäologische Auswertungen vornehmen zu können.
@@ -80,6 +82,8 @@ https://www.unrealengine.com/marketplace/en-US/product/easy-file-dialog
 
 # [EN] FundUS - The digsite analysis tool for paleolithic archaeology
 _Version 1.0_
+
+Download: [https://github.com/SelinaAndrews/FundUS/releases/tag/v1.0.0](https://github.com/SelinaAndrews/FundUS/releases/tag/v1.0.0)
 
 ## What is FundUS?
 
