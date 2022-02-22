@@ -1,9 +1,12 @@
 package de.andrews.digsitevisualization.visualization;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import de.andrews.digsitevisualization.data.GroupFinding;
 import de.andrews.digsitevisualization.data.SingularFinding;
 import de.andrews.digsitevisualization.data.Surface;
 
+import java.util.HashMap;
 import java.util.List;
 
 public class Visualization {
@@ -12,6 +15,7 @@ public class Visualization {
     private List<Surface> surfaces;
     private List<SingularFinding> singles;
     private List<GroupFinding> buckets;
+    private HashMap<String, String> metaData;
 
     public String getInfo() {
         return info;
@@ -43,5 +47,18 @@ public class Visualization {
 
     public void setBuckets(List<GroupFinding> buckets) {
         this.buckets = buckets;
+    }
+
+    public HashMap<String, String> getMetaData() {
+        return metaData;
+    }
+
+    public void setMetaData(HashMap<String, String> metaData) {
+        this.metaData = metaData;
+    }
+
+    public String generateJSON() throws JsonProcessingException {
+        ObjectMapper mapper = new ObjectMapper();
+        return mapper.writeValueAsString(this);
     }
 }

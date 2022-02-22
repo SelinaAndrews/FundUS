@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html xmlns:th="https://www.thymeleaf.org">
+<head>
+    <title>Visualisierung von Grabungsdaten</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="utf-8"/>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
+    <link th:href="@{/styles/main.css}" rel="stylesheet" >
+</head>
+<body>
+<div class="container p-3 my-3 border">
+    <div class="row">
+        <div class="col-sm-10"><h1>3D-Visualisierung paläolithischer Grabungsdaten</h1></div>
+        <div class="col">
+            <form id="shutdown" action="#" th:action="@{/shutdown}" th:object="${sessiondata}" method="get">
+                <button type="submit" class="btn btn-danger btn-block">Server beenden</button>
+            </form>
+        </div>
+    </div>
+
+    <ul class="nav nav-tabs" id="myTab" role="tablist">
+        <li class="nav-item" role="presentation">
+            <a class="nav-link active" id="manual-tab" data-toggle="tab" href="#" role="tab" aria-controls="manual" aria-selected="true">Manuelles Mapping</a>
+        </li>
+        <li class="nav-item" role="presentation">
+            <a class="nav-link" id="file-tab" data-toggle="tab" href="#" role="tab" aria-controls="file" aria-selected="false">Mapping aus Datei</a>
+        </li>
+    </ul>
+
+    <div class="tab-content" id="myTabContent">
+
+        <div class="container p-3" id="manual" role="tabpanel" aria-labelledby="manual-tab">
+            <div class="row">
+                <div class="col-sm-3 no-left-padding"><p><span class="font-weight-bold" th:text="'Ausgelesene Spalten: '"></span></p></div>
+                <div class="col"><p><span th:text="${sessiondata.dataList.columns}"></span></p></div>
+            </div>
+
+            <form id="startup" action="#" th:action="@{/startup}" th:object="${mapping}" method="post" class="needs-validation">
+                <div class="row">
+                    <p><span>Eingaben bitte mit <kbd>Enter</kbd> bestätigen.</span></p>
+                    <p><span class="font-weight-bold" th:text="'Für das erfolgreiche Auslesen der Daten müssen mindestens X, Y, Z sowie die ID Labels für die Einzelfunde definiert sein.'"></span></p>
+                </div>
+                <!-- Koordinaten -->
+                <h5>Koordinaten</h5>
+                <div class="row">
+                    <div class="form-group">
+                        <label for="x"><strong>X Spalte</strong></label>
+                        <select class="form-control" id="x" name="x" th:field="*{x}">
+                            <option selected disabled hidden value=""></option>
+                            <option th:each="column : ${sessiondata.dataList.columns}"
+                                    th:value="${column}"
+                                    th:text="${column}">
+                            </option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="y"><strong>Y Spalte</strong></label>
+                        <select class="form-control" id="y" name="y" th:field="*{y}">
+                            <option selected disabled hidden value=""></option>
+                            <option th:each="column : ${sessiondata.dataList.columns}"
+                                    th:value="${column}"
+                                    th:text="${column}"></option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="z"><strong>Z Spalte</strong></label>
+                        <select class="form-control"id="z" name="z" th:field="*{z}">
+                            <option selected disabled hidden value=""></option>
+                            <option th:each="column : ${sessiondata.dataList.columns}"
+                                    th:value="${column}"
+                                    th:text="${column}"></option>
+                        </select>
+                    </div>
+                </div>
+                <!-- IDs -->
+                <h5>Identifikation</h5>
+                <div class="row">
+                    <div class="form-group">
+                        <label for="findingNumberParts"><strong>ID Labels für Einzelfunde (Kombinationsauswahl möglich)</strong></label>
+                        <select class="form-control"
+                                id="findingNumberParts"
+                                name="findingNumberParts"
+                                th:field="*{findingNumberParts}"
+                                data-separator=" |,"
+                                multiple>
+                            <option selected disabled hidden value="">z.B. UNIT, ID</option>
+                            <option th:each="column : ${sessiondata.dataList.columns}"
+                                    th:value="${column}"
+                                    th:text="${column}"></option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="groupFindingNumberParts"><strong>ID Labels für Sammelfunde (Kombinationsauswahl möglich)</strong></label>
+                        <select class="form-control"
+                                id="groupFindingNumberParts"
+                                name="groupFindingNumberParts"
+                                th:field="*{groupFindingNumberParts}"
+                                data-separator=" |,"
+                                multiple>
+                            <option selected disabled hidden value="">z.B. UNIT, SUFFIX, ID</option>
+                            <option th:each="column : ${sessiondata.dataList.columns}"
+                                    th:value="${column}"
+                                    th:text="${column}"></option>
+                        </select>
+                    </div>
+                </div>
+                <!-- Informationen -->
+                <h5>Informationen</h5>
+                <div class="row">
+                    <div class="form-group">
+                        <label for="GH">Geologischer Horizont</label>
+                        <select class="form-control" id="GH" name="GH" th:field="*{GH}">
+                            <option selected disabled hidden value="">z.B. GH</option>
+                            <option th:each="column : ${sessiondata.dataList.columns}"
+                                    th:value="${column}"
+                                    th:text="${column}"></option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="AH">Archäologischer Horizont</label>
+                        <select class="form-control" id="AH" name="AH" th:field="*{AH}">
+                            <option selected disabled hidden value="">z.B. AH</option>
+                            <option th:each="column : ${sessiondata.dataList.columns}"
+                                    th:value="${column}"
+                                    th:text="${column}"></option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="form-group">
+                        <label for="BEST">Layer 1 - Oberflächen Definitionsspalte</label>
+                        <select class="form-control" id="BEST" name="BEST" th:field="*{BEST}">
+                            <option selected disabled hidden value="">z.B. BEST</option>
+                            <option th:each="column : ${sessiondata.dataList.columns}"
+                                    th:value="${column}"
+                                    th:text="${column}"></option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="GF">Layer 2 - Grundform</label>
+                        <select class="form-control" id="GF" name="GF" th:field="*{GF}">
+                            <option selected disabled hidden value="">z.B. GF</option>
+                            <option th:each="column : ${sessiondata.dataList.columns}"
+                                    th:value="${column}"
+                                    th:text="${column}"></option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="DEF">Layer 3 - Definition</label>
+                        <select class="form-control" id="DEF" name="DEF" th:field="*{DEF}">
+                            <option selected disabled hidden value="">z.B. definition, DEF</option>
+                            <option th:each="column : ${sessiondata.dataList.columns}"
+                                    th:value="${column}"
+                                    th:text="${column}"></option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="form-group">
+                        <label for="BEMERK">Bemerkung</label>
+                        <select class="form-control" id="BEMERK" name="BEMERK" th:field="*{BEMERK}">
+                            <option selected disabled hidden value="">z.B. Bemerkung, BEMERK</option>
+                            <option th:each="column : ${sessiondata.dataList.columns}"
+                                    th:value="${column}"
+                                    th:text="${column}"></option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="BEARBEITET">Bearbeitet</label>
+                        <select class="form-control" id="BEARBEITET" name="BEARBEITET" th:field="*{BEARBEITET}">
+                            <option selected disabled hidden value="">z.B. BEARBEITET</option>
+                            <option th:each="column : ${sessiondata.dataList.columns}"
+                                    th:value="${column}"
+                                    th:text="${column}"></option>
+                        </select>
+                    </div>
+                </div>
+                <!-- Oberflächen -->
+                <h5>Oberflächen</h5>
+                <div class="row">
+
+                    <div class="row">
+                        <div class="form-group">
+                            <label for="topoKeys">
+                                Oberflächen Schlüsselwerte in Layer 1 (Mehrfachauswahl möglich)
+                            </label>
+                            <select class="form-control" id="topoKeys" name="topoKeys" th:field="*{topoKeys}"
+                                    data-allow-new="true"
+                                    data-separator=" |,"
+                                    multiple>
+                                <option selected disabled hidden value="">z.B. TOPO, Surface</option>
+                            </select>
+                        </div>
+
+                        <div class="row">
+                            <div class="form-group">
+                                <label for="topoBool">Wahr-/Falschwert nutzen</label>
+                                <input type="checkbox" class="form-control" id="topoBool" name="topoBool" th:field="*{topoBool}">
+                            </div>
+                        </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="bestId">ID Labels der Oberflächendaten (Kombinationsauswahl möglich)</label>
+                    <select class="form-control" id="bestId" name="bestId" th:field="*{bestId}" multiple>
+                        <option selected disabled hidden value="">z.B. UNIT, ID</option>
+                        <option th:each="column : ${sessiondata.dataList.columns}"
+                                th:value="${column}"
+                                th:text="${column}"></option>
+                    </select>
+                </div>
+                </div>
+                <!-- Gruppierung -->
+                <h5>Gruppierung</h5>
+                <div class="row">
+                    <div class="form-group">
+                        <label for="EFColumn">Einzelfund Definitionsspalte</label>
+                        <select class="form-control" id="EFColumn" name="EFColumn" th:field="*{EFColumn}">
+                            <option selected disabled hidden value="">z.B. EF, Einzelfund</option>
+                            <option th:each="column : ${sessiondata.dataList.columns}"
+                                    th:value="${column}"
+                                    th:text="${column}"></option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="EFKeys">Einzelfund Schlüsselwerte (Mehrfachauswahl möglich)</label>
+                        <select class="form-control" id="EFKeys" name="EFKeys" th:field="*{EFKeys}"
+                                data-allow-new="true"
+                                data-separator=" |,"
+                                multiple>>
+                            <option selected disabled hidden value="">z.B. true, 1, EF</option>
+                        </select>
+                    </div>
+                    <div class="row">
+                        <div class="form-group">
+                            <label for="efBool">Wahr-/Falschwert nutzen</label>
+                            <input type="checkbox" class="form-control" id="efBool" name="efBool" th:field="*{efBool}">
+                        </div>
+                    </div>
+                </div>
+
+                <button id="startupButton" type="submit" class="btn btn-success" style="margin-right: 10px" name="action" value="startup">
+                    Visualisierung starten
+                    <span class="spinner-border spinner-border-sm text-light" role="status" id="spinner" hidden style="width: 1.4rem; height: 1.4rem; margin-left: 5px"></span>
+                </button>
+                <button  id="downloadMappingButton" type="submit" class="btn btn-success" style="margin-right: 10px" name="action" value="downloadMapping">
+                    Mapping herunterladen
+                </button>
+            </form>
+        </div>
+        <div class="container p-3" hidden id="file" role="tabpanel" aria-labelledby="file-tab">
+            <form id="loadMapping" action="#" th:action="@{/startup}" method="post" class="needs-validation">
+                <div class="form-group">
+                    <label for="mapping-json">Mapping-Datei</label>
+                    <input  class="form-control" required type="text" id="mapping-json" placeholder="Pfad zur Mapping-Datei einfügen" th:value="${mappingFilePath}" name="mappingFilePath">
+                    <p class="small my-2">Der Pfad zur Mapping-Datei kann durch <kbd>Shift + Rechtsklick</kbd> auf die Mapping-Datei und die Auswahl von „Als Pfad kopieren“ im Kontextmenü erhalten werden.</p>
+                </div>
+                <button id="uploadMappingButton" type="submit" class="btn btn-success" style="margin-right: 10px" name="action" value="startup">
+                    Visualisierung starten
+                    <span class="spinner-border spinner-border-sm text-light" role="status" id="spinner2" hidden style="width: 1.4rem; height: 1.4rem; margin-left: 5px"></span>
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <p id="alert"></p>
+</div>
+<script type="module">
+    import Tags from "https://cdn.jsdelivr.net/npm/bootstrap5-tags@1/tags.min.js";
+    Tags.init("select");
+    var rows = document.getElementsByClassName("row");
+    for (let i = 1; i < rows.length; i++) {
+        rows[i].style.marginLeft = "0";
+    }
+    changeCSS();
+
+    var toggleSpinnerBool = true;
+    document.getElementById("downloadMappingButton").addEventListener("click", function () {
+        toggleSpinnerBool = false;
+    });
+    document.getElementById("startupButton").addEventListener("click", function () {
+        toggleSpinnerBool = true;
+    });
+    document.getElementById("uploadMappingButton").addEventListener("click", function () {
+        toggleSpinnerBool = true;
+    });
+
+    var observer = new MutationObserver(function(mutations) {
+        mutations.forEach(function(mutation) {
+            changeCSS();
+        });
+    });
+    var config = { attributes: true, childList: true, characterData: true };
+
+    document.querySelectorAll(".form-control.dropdown div").forEach((e) => {
+        if (e.childElementCount > 1) {
+            e.firstChild.remove();
+            e.firstChild.innerHTML = "Select field to map";
+        }
+        observer.observe(e, config);
+    });
+
+    document.querySelectorAll("select.form-control option[selected='selected']").forEach((e) => {
+        e.removeAttribute("selected");
+        e.removeAttribute("data-init");
+        let newOption = document.createElement("option");
+        newOption.setAttribute("selected","selected");
+        e.parentNode.appendChild(newOption);
+    });
+
+    let formGroups = document.querySelectorAll(".form-group");
+    for (let i = 0; i < formGroups.length; i++) {
+        formGroups[i].style.setProperty("min-width", "300px", "important");
+        formGroups[i].style.setProperty("margin-right", "10px", "important");
+    }
+    let bool = document.getElementById("efBool")
+    bool.style.setProperty("width", "35px");
+    let bool2 = document.getElementById("topoBool")
+    bool2.style.setProperty("width", "35px");
+
+    function changeCSS() {
+        let badges = document.getElementsByClassName("badge");
+        for (let i = 0; i < badges.length; i++) {
+            let element = badges[i].style;
+            element.setProperty("background-color", "#958458", "important");
+            element.color = "white";
+            element.fontSize = "1em";
+            element.marginRight = "5px";
+        }
+    }
+
+    document.getElementById("startup").addEventListener("submit", toggleSpinner);
+    document.getElementById("loadMapping").addEventListener("submit", toggleSpinner);
+
+    function toggleSpinner() {
+        if (toggleSpinnerBool) {
+            document.getElementById("spinner").removeAttribute("hidden");
+            document.getElementById("spinner2").removeAttribute("hidden");
+        }
+    }
+    document.querySelectorAll("#manual-tab, #file-tab").forEach(node => {
+        node.addEventListener("click", toggleTabs);
+    });
+    function toggleTabs() {
+        const target = this.getAttribute("aria-controls");
+        let manual = document.querySelector("#manual");
+        let file = document.querySelector("#file");
+        let manualTab = document.querySelector("#manual-tab");
+        let fileTab = document.querySelector("#file-tab");
+
+        if (target === "manual") {
+            manual.removeAttribute("hidden");
+            fileTab.classList.remove("active");
+
+            file.setAttribute("hidden", "hidden");
+            manualTab.classList.add("active");
+        }
+        if (target === "file") {
+            file.removeAttribute("hidden");
+            manualTab.classList.remove("active");
+
+            manual.setAttribute("hidden", "hidden");
+            fileTab.classList.add("active");
+
+        }
+    }
+
+    setPlaceholders();
+
+    function setPlaceholders() {
+        document.querySelector("#AH + div > div > input").setAttribute("placeholder", "z.B. AH");
+        document.querySelector("#GH + div > div > input").setAttribute("placeholder", "z.B. GH");
+        document.querySelector("#BEST + div > div > input").setAttribute("placeholder", "z.B. BEST");
+        document.querySelector("#GF + div > div > input").setAttribute("placeholder", "z.B. GF");
+        document.querySelector("#DEF + div > div > input").setAttribute("placeholder", "z.B. DEF");
+        document.querySelector("#BEMERK + div > div > input").setAttribute("placeholder", "z.B. BEMERK");
+        document.querySelector("#BEARBEITET + div > div > input").setAttribute("placeholder", "z.B. BEARBEITET");
+        document.querySelector("#EFColumn + div > div > input").setAttribute("placeholder", "z.B. EFColumn");
+        document.querySelectorAll(".row > .form-group > div > div > input").forEach((input) => input.removeAttribute("size"));
+    }
+
+
+</script>
+</body>
+</html>

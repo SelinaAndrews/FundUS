@@ -5,31 +5,40 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta charset="utf-8"/>
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
+        <link th:href="@{/styles/main.css}" rel="stylesheet" >
     </head>
     <body>
         <div class="container p-3 my-3 border">
-            <h1>3D-Visualisierung paläolithischer Grabungsdaten</h1>
+            <div class="row">
+                <div class="col-sm-10"><h1>3D-Visualisierung paläolithischer Grabungsdaten</h1></div>
+                <div class="col">
+                    <form id="shutdown" action="#" th:action="@{/shutdown}" th:object="${runningSession}" method="get">
+                        <button type="submit" class="btn btn-danger btn-block">Server beenden</button>
+                    </form>
+                </div>
+            </div>
             <div class="container p-3">
                 <p>Die Visualisierung läuft mit folgenden Daten:</p>
                 <div class="row">
                     <div class="col-sm-3"><p><span class="font-weight-bold" th:text="'Datenbank: '"></span></p></div>
-                    <div class="col"><p><span th:text="${sessiondata.database}"></span></p></div>
+                    <div class="col"><p><span th:text="${runningSession.database}"></span></p></div>
                 </div>
                 <div class="row">
                     <div class="col-sm-3"><p><span class="font-weight-bold" th:text="'Tabelle: '"></span></p></div>
-                    <div class="col"><p><span th:text="${sessiondata.table}"></span></p></div>
+                    <div class="col"><p><span th:text="${runningSession.table}"></span></p></div>
                 </div>
                 <div class="row">
                     <div class="col-sm-3"><p><span class="font-weight-bold" th:text="'Grabung (Kurzbezeichnung): '"></span></p></div>
-                    <div class="col"><p><span th:text="${sessiondata.digsite}"></span></p></div>
+                    <div class="col"><p><span th:text="${runningSession.digsite}"></span></p></div>
                 </div>
                 <div class="row">
                     <div class="col-sm-3"><p><span class="font-weight-bold" th:text="'Jahr: '"></span></p></div>
-                    <div class="col"><p><span th:text="${sessiondata.year}"></span></p></div>
+                    <div class="col"><p><span th:text="${runningSession.year}"></span></p></div>
                 </div>
             </div>
             <div class="alert alert-info">
-                Zum Beenden des Programms in der Visualisierung den Button <span class="badge badge-secondary">Beenden</span> verwenden. Dieser beendet sowohl die Visualisierung, als auch den Server.
+                <p>Zum Beenden des Programms in der Visualisierung den Button <span class="badge badge-secondary">Beenden</span> verwenden. Dieser beendet sowohl die Visualisierung, als auch den Server.</p>
+                <p class="font-weight-light text-dark">Für den Fall, dass die Visualisierung nicht ordnungsgemäß gestartet oder beendet wird, kann der Button <span class="badge badge-secondary">Server beenden</span> am oberen Rand dieser Seite verwendet werden, um den Server im Hintergrund zu beenden.</p>
             </div>
         <p id="alert"></p>
         </div>        

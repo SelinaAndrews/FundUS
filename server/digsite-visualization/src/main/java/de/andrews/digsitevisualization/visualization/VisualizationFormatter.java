@@ -1,19 +1,16 @@
 package de.andrews.digsitevisualization.visualization;
 
 import de.andrews.digsitevisualization.SessionData;
+import de.andrews.digsitevisualization.calculation.MeasurementGroupIdentifier;
 import de.andrews.digsitevisualization.calculation.SurfaceCalculator;
 import de.andrews.digsitevisualization.data.*;
-import de.andrews.digsitevisualization.calculation.MeasurementGroupIdentifier;
 import de.andrews.digsitevisualization.repository.Measurement;
 import io.github.jdiemke.triangulation.NotEnoughPointsException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -31,19 +28,37 @@ public class VisualizationFormatter {
     public Visualization formatVisualization(List<Measurement> originalMeasurements, SessionData sessionData) {
         this.sessionData = sessionData;
 
+        HashMap<String, String> metaData = new HashMap<>();
+        metaData.put("path", this.sessionData.getDatabase());
+        metaData.put("table", this.sessionData.getTable());
+        metaData.put("digsite", this.sessionData.getDigsite());
+        metaData.put("year", this.sessionData.getYear());
+        metaData.put("xLow", this.sessionData.getxLow());
+        metaData.put("xHigh", this.sessionData.getxHigh());
+        metaData.put("yLow", this.sessionData.getyLow());
+        metaData.put("yHigh", this.sessionData.getyHigh());
+        metaData.put("zLow", this.sessionData.getzLow());
+        metaData.put("zHigh", this.sessionData.getzHigh());
+
+        logger.info("mapping visualization to jsonobject");
         List<Measurement> measurements = limitAxes(originalMeasurements);
 
         info = "Fund- und Oberflächendaten korrekt abgerufen";
 
+
+        logger.info("formatSurfaces");
         List<Surface> surfaces = formatSurfaces(measurements);
+        logger.info("formatGroupFindings");
         List<GroupFinding> groupFindings = formatGroupFindings(measurements);
 
         List<SingularFinding> singularFindings = new ArrayList<>();
 
+        logger.info("formatSingularFindings");
         for (Measurement measurement : measurements) {
-            if (measurement.getEF() && !topo.equals(measurement.getBEST())) {
+            if (measurement.getEF() && !measurement.getTOPO()) {
                 SingularFinding singularFinding = formatSingularFinding(measurement);
                 singularFindings.add(singularFinding);
+                measurement.setType(Measurement.Type.SINGLEFIND);
             }
         }
 
@@ -52,7 +67,11 @@ public class VisualizationFormatter {
         visualization.setSingles(singularFindings);
         visualization.setBuckets(groupFindings);
         visualization.setSurfaces(surfaces);
+        visualization.setMetaData(metaData);
 
+
+        logger.info("formatting all data finished");
+        this.sessionData.setCurrentMeasurements(measurements);
         return visualization;
     }
 
@@ -112,51 +131,25 @@ public class VisualizationFormatter {
      *  for single findings: [digsite][year of dig].[unit].[finding number]
      *  for group findings: [digsite][year of dig].[unit][sub unit].[finding number].[sub finding number]
      * **/
-    private String formatFindingNumber(Measurement measurement, String type) {
+    public String formatFindingNumber(Measurement measurement, Measurement.Type type) {
 
         StringBuilder findingNumber = new StringBuilder();
 
-        if (type.equals("single")) {
+        if (type == Measurement.Type.SINGLEFIND || type == Measurement.Type.SURFACE) {
             findingNumber.append(sessionData.getDigsite());
             findingNumber.append(sessionData.getYear());
             findingNumber.append(".");
-            findingNumber.append(measurement.getUNIT());
-            findingNumber.append(".");
-            findingNumber.append(measurement.getID());
-        } else if (type.equals("group")) {
+            findingNumber.append(String.join(".",measurement.getFindingNumberParts()));
+
+        } else if (type == Measurement.Type.GROUPFIND) {
             findingNumber.append(sessionData.getDigsite());
             findingNumber.append(sessionData.getYear());
             findingNumber.append(".");
-            findingNumber.append(measurement.getUNIT());
-
-            //Get the sub unit (a, b, c, or d) depending on the location of the group finding within the unit
-            double x = Double.parseDouble(measurement.getX().replace(",", "."));
-            double y = Double.parseDouble(measurement.getY().replace(",", "."));
-
-            double xQuadrant = x - Math.floor(x);
-            double yQuadrant = y - Math.floor(y);
-
-            if (xQuadrant >= 0.5) {
-                if (yQuadrant >= 0.5) {
-                    findingNumber.append("b");
-                } else {
-                    findingNumber.append("d");
-                }
-            } else {
-                if (yQuadrant >= 0.5) {
-                    findingNumber.append("a");
-                } else {
-                    findingNumber.append("c");
-                }
-            }
-
-            findingNumber.append(".");
-            findingNumber.append(measurement.getID());
-            findingNumber.append(".");
-            findingNumber.append(measurement.getSUFFIX());
+            findingNumber.append(String.join(".",measurement.getGroupFindingNumberParts()));
         }
-
-        return findingNumber.toString();
+        String findingNumberStr = findingNumber.toString();
+        measurement.setFindingNumber(findingNumberStr);
+        return findingNumberStr;
     }
 
     /** Format the information for a single finding for the visualization application. **/
@@ -179,7 +172,9 @@ public class VisualizationFormatter {
         finding.setWorked(measurement.getBEARBEITET());
         finding.setImage(""); // TODO: Implement image paths
 
-        finding.setId(formatFindingNumber(measurement, "single"));
+        finding.setUnmappedData(measurement.getRemainingData());
+
+        finding.setId(formatFindingNumber(measurement, Measurement.Type.SINGLEFIND));
 
         return finding;
     }
@@ -203,7 +198,7 @@ public class VisualizationFormatter {
                 Matcher matcher = pattern.matcher(geologicalHorizon);
                 matcher.find();
                 int layer = Integer.parseInt(matcher.group());
-                logger.info("Geological horizon " + geologicalHorizon + " has been parsed and identified as layer " + layer);
+                //logger.info("Geological horizon " + geologicalHorizon + " has been parsed and identified as layer " + layer);
                 return layer;
             }
         } else {
@@ -221,7 +216,9 @@ public class VisualizationFormatter {
         //Filter the measurements to only select surface data
         List<Measurement> topoMeasurements = new ArrayList<>();
         for (Measurement measurement : allMeasurements) {
-            if (topo.equals(measurement.getBEST())) {
+            if (measurement.getTOPO()) {
+                measurement.setType(Measurement.Type.SURFACE);
+                formatFindingNumber(measurement, Measurement.Type.SURFACE);
                 topoMeasurements.add(measurement);
             }
         }
@@ -235,8 +232,9 @@ public class VisualizationFormatter {
             List<Vertex> pointList = new ArrayList<>();
             String geologicalHorizon = "";
             int index = 0;
+            String surfaceNumber = sessionData.getDigsite() + sessionData.getYear() + "." + String.join(".", s.getBestId());
             for (Measurement m : topoMeasurements) {
-                if (m.getUNIT().equals(s.getUnit()) && m.getID().equals(s.getId())) {
+                if (m.getBestId().equals(s.getBestId())) {
                     double x = Double.parseDouble(m.getX().replace(",", "."));
                     double y = Double.parseDouble(m.getY().replace(",", "."));
                     double z = Double.parseDouble(m.getZ().replace(",", "."));
@@ -249,6 +247,7 @@ public class VisualizationFormatter {
                 Surface surface = new Surface();
                 surface.setLayer(getLayer(geologicalHorizon));
                 surface.setVertices(pointList);
+                surface.setId(surfaceNumber);
 
                 try {
                     surface.setConnections(surfaceCalculator.calculateSurface(pointList, false));
@@ -258,7 +257,7 @@ public class VisualizationFormatter {
 
                 surfaces.add(surface);
             } else {
-                logger.warn("Measurement group with unit " + s.getUnit() + " and ID " + s.getId() + " contained less than three points and was not rendered.");
+                logger.warn("Measurement group with identification " + s.getBestId() + " contained less than three points and was not rendered.");
             }
         }
 
@@ -272,8 +271,11 @@ public class VisualizationFormatter {
         //Filter the measurements to exclude single finds and surfaces
         List<Measurement> groupMeasurements = new ArrayList<>();
         for (Measurement measurement : allMeasurements) {
-            if (!measurement.getEF() && !topo.equals(measurement.getBEST())) {
+            boolean singlefind = measurement.getEF();
+            boolean topo = measurement.getTOPO();
+            if (!singlefind && !topo) {
                 groupMeasurements.add(measurement);
+                measurement.setType(Measurement.Type.GROUPFIND);
             }
         }
 
@@ -288,7 +290,7 @@ public class VisualizationFormatter {
             List<SubGroupFinding> subGroupFindings = new ArrayList<>();
 
             for (Measurement m : groupMeasurements) {
-                if (m.getUNIT().equals(s.getUnit()) && m.getID().equals(s.getId())) {
+                if (m.getBestId().equals(s.getBestId())) {
                     layer = m.getGH();
                     SubGroupFinding subGroupFinding = new SubGroupFinding();
                     double x = Double.parseDouble(m.getX().replace(",", "."));
@@ -298,7 +300,7 @@ public class VisualizationFormatter {
                     centerPosition.setY(y);
                     centerPosition.setZ(z);
 
-                    subGroupFinding.setId(formatFindingNumber(m, "group"));
+                    subGroupFinding.setId(formatFindingNumber(m, Measurement.Type.GROUPFIND));
                     subGroupFinding.setIdentification(m.getBEST());
                     subGroupFinding.setBasicForm(m.getGF());
                     subGroupFinding.setDefinition(m.getDEF());
@@ -306,6 +308,8 @@ public class VisualizationFormatter {
                     subGroupFinding.setComment(m.getBEMERK());
                     subGroupFinding.setWorked(m.getBEARBEITET());
                     subGroupFinding.setGeologicalHorizon(layer);
+
+                    subGroupFinding.setUnmappedData(m.getRemainingData());
 
                     subGroupFindings.add(subGroupFinding);
                 }
@@ -329,7 +333,7 @@ public class VisualizationFormatter {
         for (Measurement m : measurements) {
             boolean isRegistered = false;
             //Create a group identifier from unit and ID
-            MeasurementGroupIdentifier identifier = new MeasurementGroupIdentifier(m.getUNIT(), m.getID());
+            MeasurementGroupIdentifier identifier = new MeasurementGroupIdentifier(m.getBestId());
             for (MeasurementGroupIdentifier s : measurementGroupIdentifiers) {
                 //Check if the identifier created from the measurement has already been registered
                 if (s.equals(identifier)) {
@@ -343,5 +347,13 @@ public class VisualizationFormatter {
             }
         }
         return measurementGroupIdentifiers;
+    }
+
+    /**
+     * for testing purposes
+     * @param sessionData
+     */
+    public void setSessionData(SessionData sessionData) {
+        this.sessionData = sessionData;
     }
 }

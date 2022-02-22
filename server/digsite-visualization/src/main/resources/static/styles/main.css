@@ -1,0 +1,50 @@
+body {
+    background-color: #353531;
+    color: #FFFFFF;
+}
+
+.border {
+    border: 3px solid #111110!important;
+}
+
+.btn-success {
+    background-color: #1F1F1D;
+    border: 3px solid #111110!important;
+}
+
+.btn-success:hover, .btn-success:focus {
+    background-color: #7D6C3F;
+}
+
+.row {
+    margin-left: 0!important;
+}
+
+#manual-tab.active, #file-tab.active, #manual-tab:hover, #file-tab:hover {
+    background-color: #353531;
+    color: #fff;
+}
+
+#manual-tab, #file-tab {
+    background-color: #1F1F1D;
+    border-width: 3px 3px 0px;
+    border-style: solid;
+    border-color: #111110;
+    border-bottom: #353531 3px;
+    color: #fff;
+}
+.nav-tabs {
+    border-bottom: 3px solid #111110;
+}
+
+h1 {
+    margin-bottom: 50px;
+}
+
+.no-left-padding {
+    padding-left: 0px;
+}
+
+.tab-content, h5 {
+    margin-top: 30px;
+}

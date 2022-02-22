@@ -1,0 +1,34 @@
+{
+  "x": "X",
+  "y": "Y",
+  "z": "Z",
+  "findingNumberParts": [
+    "UNIT",
+    "ID"
+  ],
+  "groupFindingNumberParts": [
+    "UNIT",
+    "ID",
+    "SUFFIX"
+  ],
+  "gh": "GH",
+  "ah": "AH",
+  "best": "BEST",
+  "gf": "GF",
+  "def": "DEF",
+  "bemerk": "BEMERK",
+  "bearbeitet": "BEARBEITET",
+  "topoKeys": [
+    "TOPO"
+  ],
+  "topoBool": false,
+  "bestId": [
+    "UNIT",
+    "ID"
+  ],
+  "efcolumn": "EF",
+  "efkeys": [
+    "true"
+  ],
+  "efBool": true
+}

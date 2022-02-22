@@ -1,5 +1,11 @@
 package de.andrews.digsitevisualization.data;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+
+import java.util.HashMap;
+import java.util.Map;
+
+@JsonSerialize(using = SubGroupFindingSerializer.class)
 public class SubGroupFinding {
 
     private String identification;
@@ -10,6 +16,7 @@ public class SubGroupFinding {
     private String image;
     private String comment;
     private boolean worked;
+    private Map<String,String> unmappedData = new HashMap<>();
 
     public SubGroupFinding() {}
 
@@ -22,6 +29,14 @@ public class SubGroupFinding {
         this.image = image;
         this.comment = comment;
         this.worked = worked;
+    }
+
+    public Map<String, String> getUnmappedData() {
+        return unmappedData;
+    }
+
+    public void setUnmappedData(Map<String, String> unmappedData) {
+        this.unmappedData = unmappedData;
     }
 
     public String getIdentification() {

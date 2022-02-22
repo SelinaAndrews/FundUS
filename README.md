@@ -73,6 +73,9 @@ https://sourceforge.net/projects/csvjdbc/
 Apache POI
 https://poi.apache.org/
 
+Easy File Dialog
+https://www.unrealengine.com/marketplace/en-US/product/easy-file-dialog
+
 ---
 
 # [EN] FundUS - The digsite analysis tool for paleolithic archaeology
@@ -146,3 +149,6 @@ https://sourceforge.net/projects/csvjdbc/
 
 Apache POI
 https://poi.apache.org/
+
+Easy File Dialog
+https://www.unrealengine.com/marketplace/en-US/product/easy-file-dialog

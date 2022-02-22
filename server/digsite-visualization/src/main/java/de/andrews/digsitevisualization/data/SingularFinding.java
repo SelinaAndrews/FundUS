@@ -1,5 +1,11 @@
 package de.andrews.digsitevisualization.data;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+
+import java.util.HashMap;
+import java.util.Map;
+
+@JsonSerialize(using = SingularFindingSerializer.class)
 public class SingularFinding {
 
     private Vertex vertex;
@@ -12,6 +18,7 @@ public class SingularFinding {
     private String image;
     private String comment;
     private boolean worked;
+    private Map<String, String> unmappedData = new HashMap<>();
 
     public SingularFinding() {}
 
@@ -26,6 +33,14 @@ public class SingularFinding {
         this.image = image;
         this.comment = comment;
         this.worked = worked;
+    }
+
+    public Map<String, String> getUnmappedData() {
+        return unmappedData;
+    }
+
+    public void setUnmappedData(Map<String, String> unmappedData) {
+        this.unmappedData = unmappedData;
     }
 
     public Vertex getVertex() {

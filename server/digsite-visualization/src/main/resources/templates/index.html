@@ -5,20 +5,36 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta charset="utf-8"/>
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
+        <link th:href="@{/styles/main.css}" rel="stylesheet" >
     </head>
     <body>
         <div class="container p-3 my-3 border">
-            <h1>3D-Visualisierung paläolithischer Grabungsdaten</h1>
+            <div class="row">
+                <div class="col-sm-10"><h1>3D-Visualisierung paläolithischer Grabungsdaten</h1></div>
+                <div class="col">
+                    <form id="shutdown" action="#" th:action="@{/shutdown}" th:object="${sessiondata}" method="get">
+                        <button type="submit" class="btn btn-danger btn-block">Server beenden</button>
+                    </form>
+                </div>
+            </div>
             <div class="container p-3">
-                <form id="startup" action="#" th:action="@{/startup}" th:object="${sessiondata}" method="post" class="needs-validation">
+                <form id="startup" action="#" th:action="@{/mapping}" th:object="${sessiondata}" method="post" class="needs-validation">
                     <div class="form-group">
                         <label for="database">Datenbank</label>
                         <input  class="form-control" required type="text" id="database" name="database" placeholder="Pfad zur Datenbank einfügen" th:field="*{database}">
-                        <p class="small my-2">Der Pfad zur Datenbank kann durch <kbd>Shift + Rechtsklick</kbd> auf die Access-Datei und die Auswahl von „Als Pfad kopieren“ im Kontextmenü erhalten werden.</p>
+                        <p class="small my-2">Der Pfad zur Datenbank kann durch <kbd>Shift + Rechtsklick</kbd> auf die Datenbank-Datei und die Auswahl von „Als Pfad kopieren“ im Kontextmenü erhalten werden.</p>
                     </div>
-                    <div class="form-group">
+                    <div class="form-group" id="non-csv-content">
                         <label for="table">Tabelle</label>
                         <input  class="form-control" required type="text" id="table" name="table" placeholder="Name der Tabelle eingeben" th:field="*{table}">
+                    </div>
+                    <div class="row" id="csv-content" hidden>
+                        <div class="col-6">
+                            <div class="form-group">
+                                <label for="separator">Separator (nur CSV Dateien)</label>
+                                <input  class="form-control" type="text" id="separator" name="separator" placeholder="Separator (nur CSV Dateien)" th:field="*{separator}">
+                            </div>
+                        </div>
                     </div>
                     <div class="row">
                         <div class="col-6">
@@ -77,11 +93,59 @@
                             </div>
                         </div>
                     </div>
-                    
-                    <button type="submit" class="btn btn-success">Visualisierung starten</button>
+
+                    <button type="submit" class="btn btn-success">
+                        Zum Mapping
+                        <span class="spinner-border spinner-border-sm text-light" role="status" id="spinner" hidden style="width: 1.4rem; height: 1.4rem; margin-left: 5px"></span>
+                    </button>
                 </form>
             </div>
         <p id="alert"></p>
-        </div>        
+        </div>
+    <script>
+        const databaseField = document.getElementById("database");
+        databaseField.addEventListener("input", updateFields);
+        const separatorField = document.getElementById("csv-content");
+        const tableField = document.getElementById("non-csv-content");
+        const tableInputField = document.getElementById("table");
+        var path;
+
+        function checkDatabseType() {
+            path = databaseField.value
+            return path.substr(path.lastIndexOf(".")+1);
+        }
+
+        function updateFields() {
+            const type = checkDatabseType();
+            if (type === "csv" || type === "csv\"") {
+                updateForCsv();
+            } else {
+                updateForOther();
+            }
+        }
+        function updateForCsv() {
+            tableField.setAttribute("hidden", "hidden");
+            if (tableInputField.getAttribute("required") !== null) {
+                tableInputField.removeAttribute("required");
+            }
+            tableField.value = "";
+            if (separatorField.getAttribute("hidden") !== null) {
+                separatorField.removeAttribute("hidden");
+            }
+        }
+        function updateForOther() {
+            if (tableField.getAttribute("hidden") !== null) {
+                tableField.removeAttribute("hidden");
+            }
+            tableInputField.setAttribute("required", "required");
+            separatorField.setAttribute("hidden", "hidden");
+            separatorField.value = "";
+        }
+
+        document.getElementById("startup").addEventListener("submit", toggleSpinner);
+        function toggleSpinner() {
+            document.getElementById("spinner").removeAttribute("hidden");
+        }
+    </script>
     </body>
 </html> 

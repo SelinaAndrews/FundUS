@@ -7,13 +7,23 @@ public class Surface {
     private List<Vertex> vertices;
     private List<Triangle> connections;
     private int layer;
+    private String id;
 
     public Surface() {}
 
-    public Surface(List<Vertex> vertices, List<Triangle> connections, int layer, String label) {
+    public Surface(List<Vertex> vertices, List<Triangle> connections, int layer, String label, String id) {
         this.vertices = vertices;
         this.connections = connections;
         this.layer = layer;
+        this.id = id;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 
     public List<Vertex> getVertices() {

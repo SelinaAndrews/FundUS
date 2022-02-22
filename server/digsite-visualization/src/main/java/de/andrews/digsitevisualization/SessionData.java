@@ -1,11 +1,19 @@
 package de.andrews.digsitevisualization;
 
+import de.andrews.digsitevisualization.repository.Measurement;
+import de.andrews.digsitevisualization.repository.MeasurementMapping;
 import org.springframework.stereotype.Component;
+import de.andrews.digsitevisualization.repository.MeasurementRepository.DataList;
 
 import java.io.IOException;
+import java.util.List;
 
 @Component
 public class SessionData {
+
+    private List<Measurement> currentMeasurements = null;
+    private DataList dataList;
+    private MeasurementMapping mapping;
 
     private String database = "";
     private String table = "";
@@ -18,6 +26,9 @@ public class SessionData {
     private String yHigh = "";
     private String zLow = "";
     private String zHigh = "";
+
+    private String separator;
+
     private boolean preset; //Using axis limits from website - yes/no
 
     /** For each pair of limitations of an axis, check which one is higher. Set this as the high value of this axis and the other as the low value. **/
@@ -65,13 +76,45 @@ public class SessionData {
                     this.setzHigh(z1);
                 }
             } else {
-                this.setyLow(y1);
-                this.setyHigh(y2);
+                this.setzLow(z1);
+                this.setzHigh(z2);
             }
         } catch (Exception e) {
             e.printStackTrace();
             throw new IOException("Invalid axis limitations.");
         }
+    }
+
+    public String getSeparator() {
+        return separator;
+    }
+
+    public void setSeparator(String separator) {
+        this.separator = separator;
+    }
+
+    public MeasurementMapping getMapping() {
+        return mapping;
+    }
+
+    public void setMapping(MeasurementMapping mapping) {
+        this.mapping = mapping;
+    }
+
+    public DataList getDataList() {
+        return dataList;
+    }
+
+    public void setDataList(DataList dataList) {
+        this.dataList = dataList;
+    }
+
+    public List<Measurement> getCurrentMeasurements() {
+        return currentMeasurements;
+    }
+
+    public void setCurrentMeasurements(List<Measurement> currentMeasurements) {
+        this.currentMeasurements = currentMeasurements;
     }
 
     public String getDatabase() {
